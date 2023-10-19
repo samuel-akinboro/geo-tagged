@@ -2,11 +2,17 @@ import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '../components/Themed';
 import Sizes from '../constants/Sizes';
 import { Ionicons } from '@expo/vector-icons';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import ZoomableImage from '../components/ZoomableImage';
+import MapView, { Marker } from 'react-native-maps';
+import CustomMarker from '../components/CustomMarker';
+import { useImageGallery } from '../Providers/ImageGallery';
 
 export default function HomeScreen({navigation}: any) {
+  const { images } = useImageGallery();
+  const [previewImage, setPreviewImage] = useState(null);
+
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -15,20 +21,25 @@ export default function HomeScreen({navigation}: any) {
 
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
+    // console.log('handleSheetChanges', index);
   }, []);
+
+  const handlePreviewImage = (image) => {
+    bottomSheetRef.current?.expand();
+    setPreviewImage(image);
+  }
 
   return (
     <View style={styles.container}>
       <FlatList 
-        data={["", "", "", "", "", "", ""]}
+        data={images}
         style={styles.flatlist}
         numColumns={3}
         renderItem={({item}) => (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => handlePreviewImage(item)}>
             <Image
               style={styles.gridImage} 
-              source={{uri: "https://media.istockphoto.com/id/1041174316/photo/european-telecommunication-network-connected-over-europe-france-germany-uk-italy-concept.jpg?s=612x612&w=0&k=20&c=rrqIaHQDZajRhFTLijbSdTz4JfV2bZVLtPtGRHuvk6o="}} 
+              source={{uri: item.uri}} 
             />
           </TouchableOpacity>
         )}
@@ -38,6 +49,12 @@ export default function HomeScreen({navigation}: any) {
         contentContainerStyle={{
           gap: 10
         }}
+        ListEmptyComponent={(
+          <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: Sizes.height * .30}}>
+            <Ionicons name="ios-grid-outline" size={64} color="#c3c3c3" />
+            <Text style={{marginTop: 10, color: "#5b5b5b"}}>You don't have any photos</Text>
+          </View>
+        )}
       />
 
       {/* Add New Photo */}
@@ -51,17 +68,32 @@ export default function HomeScreen({navigation}: any) {
       {/* Photo details */}
       <BottomSheet
         ref={bottomSheetRef}
-        index={0}
+        index={-1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         enablePanDownToClose={true}
       >
-        <View style={{flex: 0.70, backgroundColor: 'red'}}>
+        <View style={{flex: 0.70}}>
           <ZoomableImage 
-            uri="https://media.istockphoto.com/id/1041174316/photo/european-telecommunication-network-connected-over-europe-france-germany-uk-italy-concept.jpg?s=612x612&w=0&k=20&c=rrqIaHQDZajRhFTLijbSdTz4JfV2bZVLtPtGRHuvk6o=" 
+            uri={previewImage?.uri} 
             style={styles.modalImage}
           />
         </View>
+        <MapView 
+          style={{flex: 0.30}}
+          initialRegion={{
+            latitude: 6.527730,
+            longitude: 3.134468,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+          }}
+        >
+          <CustomMarker
+            uri={previewImage?.uri}
+            latitude={previewImage?.latitude}
+            longitude={previewImage?.longitude}
+          />
+        </MapView>
       </BottomSheet>
     </View>
   );

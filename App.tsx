@@ -8,6 +8,7 @@ import { Ionicons, Feather} from '@expo/vector-icons'
 import MapScreen from './screens/MapScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { ImageGalleryProvider } from './Providers/ImageGallery';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -41,14 +42,16 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <BottomSheetModalProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen name="Main" component={MainRoute} options={{headerShown: false}} />
-              <Stack.Screen name="Camera" component={CameraScreen} options={{headerBackTitle: 'back'}} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </ThemeProvider>
+        <ImageGalleryProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen name="Main" component={MainRoute} options={{headerShown: false}} />
+                <Stack.Screen name="Camera" component={CameraScreen} options={{headerBackTitle: 'back'}} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ThemeProvider>
+        </ImageGalleryProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
