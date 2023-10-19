@@ -2,24 +2,32 @@ import { Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '../components/Themed';
 import MapView, { Marker } from 'react-native-maps';
 import CustomMarker from '../components/CustomMarker';
+import { useImageGallery } from '../Providers/ImageGallery';
 
 export default function MapScreen() {
+  const { images } = useImageGallery();
+
+  const recentImage = images[images.length - 1];
+
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        initialRegion={{
-          latitude: 6.527730,
-          longitude: 3.134468,
+        region={{
+          latitude: recentImage?.latitude || 25.276987,
+          longitude: recentImage?.longitude || 55.296249,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
       >
-        <CustomMarker
-          uri="https://media.istockphoto.com/id/1041174316/photo/european-telecommunication-network-connected-over-europe-france-germany-uk-italy-concept.jpg?s=612x612&w=0&k=20&c=rrqIaHQDZajRhFTLijbSdTz4JfV2bZVLtPtGRHuvk6o="
-          latitude={6.527730}
-          longitude={3.134468}
-        />
+        {images.map((image) => (
+          <CustomMarker
+            key={image.id}
+            uri={image.uri}
+            latitude={image.latitude}
+            longitude={image.longitude}
+          />
+        ))}
       </MapView>
     </View>
   );

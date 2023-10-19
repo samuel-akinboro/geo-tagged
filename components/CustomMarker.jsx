@@ -7,7 +7,7 @@ const CustomMarker = ({
   uri,
   latitude,
   longitude
-}: any) => {
+}) => {
   return (
     <Marker
       coordinate={{

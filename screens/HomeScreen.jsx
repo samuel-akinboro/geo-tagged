@@ -1,4 +1,4 @@
-import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '../components/Themed';
 import Sizes from '../constants/Sizes';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,18 +9,18 @@ import MapView, { Marker } from 'react-native-maps';
 import CustomMarker from '../components/CustomMarker';
 import { useImageGallery } from '../Providers/ImageGallery';
 
-export default function HomeScreen({navigation}: any) {
-  const { images } = useImageGallery();
+export default function HomeScreen({navigation}) {
+  const { images, removeImage } = useImageGallery();
   const [previewImage, setPreviewImage] = useState(null);
 
   // ref
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef(null);
 
   // variables
   const snapPoints = useMemo(() => ['100%'], []);
 
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
+  const handleSheetChanges = useCallback((index) => {
     // console.log('handleSheetChanges', index);
   }, []);
 
@@ -29,16 +29,39 @@ export default function HomeScreen({navigation}: any) {
     setPreviewImage(image);
   }
 
+  const handleDeletePhoto = () => {
+    Alert.alert(
+      'Delete Photo',
+      'Are you sure you want to perform this action?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            removeImage(previewImage?.id);
+            setPreviewImage(null);
+            bottomSheetRef.current.close();
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList 
-        data={images}
+        data={images.reverse()}
         style={styles.flatlist}
         numColumns={3}
+        keyExtractor={(item) => item.id}
         renderItem={({item}) => (
           <TouchableOpacity onPress={() => handlePreviewImage(item)}>
             <Image
-              style={styles.gridImage} 
+              style={styles.gridImage}  
               source={{uri: item.uri}} 
             />
           </TouchableOpacity>
@@ -78,6 +101,12 @@ export default function HomeScreen({navigation}: any) {
             uri={previewImage?.uri} 
             style={styles.modalImage}
           />
+          <TouchableOpacity 
+            style={styles.deleteBtn}
+            onPress={handleDeletePhoto}
+          >
+            <Ionicons name="trash" size={24} color="red" />
+          </TouchableOpacity>
         </View>
         <MapView 
           style={{flex: 0.30}}
@@ -108,7 +137,8 @@ const styles = StyleSheet.create({
   flatlist: {
     padding: Sizes.padding,
     flex: 1,
-    paddingTop: 32
+    paddingTop: 32,
+    width: '100%'
   },
   gridImage: {
     width: (Sizes.width - (Sizes.padding * 2)) * .30,
@@ -119,7 +149,7 @@ const styles = StyleSheet.create({
     height: Sizes.height * 0.08,
     width: Sizes.height * 0.08,
     borderRadius: 1000,
-    backgroundColor: '#29b641',
+    backgroundColor: '#0c72d8',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
@@ -128,5 +158,16 @@ const styles = StyleSheet.create({
   },
   modalImage: {
     flex: 0.7
+  },
+  deleteBtn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: Sizes.height * .07,
+    width: Sizes.height * .07,
+    borderRadius: 1000,
+    backgroundColor: '#00000021',
+    position: 'absolute',
+    bottom: Sizes.padding,
+    right: Sizes.padding
   }
 });

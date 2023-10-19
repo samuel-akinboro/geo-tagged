@@ -21,18 +21,34 @@ export function ImageGalleryProvider({ children }) {
       });
   }, []);
 
-  const saveImage = async (image: any) => {
-    // Save the new image path to AsyncStorage and update the state
-    const newImages = [...images, image];
-    setImages(newImages);
-    await AsyncStorage.setItem('imageGallery', JSON.stringify(newImages));
+  // const saveImage = async (image) => {
+  //   // Save the new image path to AsyncStorage and update the state
+  //   const newImages = [...images, image];
+  //   setImages(newImages);
+  //   await AsyncStorage.setItem('imageGallery', JSON.stringify(newImages));
+  // };
+
+  const saveImage = async (image, callback) => {
+    callback(true);
+    try {
+      const newImages = [...images, image];
+      setImages(newImages);
+      await AsyncStorage.setItem('imageGallery', JSON.stringify(newImages));
+    } catch (error) {
+      console.error('Error saving image:', error);
+    } finally {
+      callback(false);
+    }
   };
 
-  const removeImage = async (image) => {
+  const removeImage = async (id) => {
     // Remove the image path from AsyncStorage and update the state
-    const updatedImages = images.filter((image) => image?.id !== image?.id);
+    const updatedImages = images.filter((img) => img?.id !== id);
     setImages(updatedImages);
     await AsyncStorage.setItem('imageGallery', JSON.stringify(updatedImages));
+
+    // const updatedImages = images.every((img) => img?.id == id);
+    // console.log(updatedImages)
   };
 
   return (

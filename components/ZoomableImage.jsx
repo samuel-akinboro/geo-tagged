@@ -2,15 +2,11 @@ import React from 'react';
 import Animated, { useAnimatedGestureHandler, useSharedValue, withSpring } from 'react-native-reanimated';
 import { PinchGestureHandler } from 'react-native-gesture-handler';
 
-interface Props {
-  uri: string
-}
-
-export default function ZoomableImage({ uri }: Props) {
+export default function ZoomableImage({ uri }) {
   const scale = useSharedValue(1);
 
   const gestureHandler = useAnimatedGestureHandler({
-    onActive: (event: any, context) => {
+    onActive: (event, context) => {
       event.scale >= 1 ? scale.value = withSpring(event?.scale) : scale.value = 1;
     },
     // onEnd: () => {

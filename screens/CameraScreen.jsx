@@ -1,31 +1,33 @@
 import { Text, View } from "../components/Themed";
 import { Camera, CameraType } from 'expo-camera';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Button, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
 import Sizes from "../constants/Sizes";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from '@gorhom/bottom-sheet';
 import ZoomableImage from "../components/ZoomableImage";
 import { useImageGallery } from "../Providers/ImageGallery";
 import * as Location from 'expo-location';
-import { v4 as uuid } from 'uuid';
+import "react-native-get-random-values"
+import { v4 as uuidv4 } from 'uuid';
 
 export default function() {
-  const cameraRef = useRef<any>(null);
-  const [picture, setPicture] = useState<any>(null);
+  const cameraRef = useRef(null);
+  const [picture, setPicture] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const { saveImage } = useImageGallery();
+  const [loading, setLoading] = useState(false);
   const [cameraPermission, requestCameraPermission] = Camera.useCameraPermissions();
-  const [locationPermission, setLocationPermission] = useState<null | boolean>(null);
+  const [locationPermission, setLocationPermission] = useState(null);
 
   // ref
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef(null);
 
   // variables
   const snapPoints = useMemo(() => ['90%'], []);
 
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
+  const handleSheetChanges = useCallback((index) => {
     // setPicture(null)
   }, []);
 
@@ -78,19 +80,25 @@ export default function() {
 
   // Save image to gallery
 const savePhoto = async () => {
+  if(!loading) {
+    setLoading(true)
   let location = await Location.getCurrentPositionAsync({});
+
+  const newUuid = uuidv4();
+
   saveImage({
-    id: uuid({
-      random: [
-        0x10, 0x91, 0x56, 0xbe, 0xc4, 0xfb, 0xc1, 0xea, 0x71, 0xb4, 0xef, 0xe1, 0x67, 0x1c, 0x58, 0x36,
-      ],
-    }),
+    id: newUuid,
     uri: picture?.uri,
     latitude: location.coords.latitude,
     longitude: location.coords.longitude
+  }, (loadingState) => {
+    if(loadingState == false) {
+      setLoading(false)
+      setPicture(null);
+      handleClosePreview()
+    }
   });
-  setPicture(null);
-  handleClosePreview()
+  }
 };
 
   return (
@@ -147,7 +155,8 @@ const savePhoto = async () => {
             style={styles.saveBtn}
             onPress={savePhoto}
           >
-            <Text style={styles.saveBtnText}>Save</Text>
+            {!loading && <Text style={styles.saveBtnText}>Save</Text>}
+            {loading && <ActivityIndicator color="#fff" size={13} />}
           </TouchableOpacity>
        </View>
       </BottomSheet>
@@ -206,9 +215,10 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 1,
     borderColor: '#d62f0e',
-    paddingVertical: 15,
+    height: 50,
     borderRadius: 6,
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   trashBtnText: {
     color: '#d62f0e',
@@ -218,10 +228,11 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 1,
     borderColor: '#0b5bb6',
-    paddingVertical: 15,
+    height: 50,
     borderRadius: 6,
     alignItems: 'center',
-    backgroundColor: '#0b5bb6'
+    backgroundColor: '#0b5bb6',
+    justifyContent: 'center'
   },
   saveBtnText: {
     color: '#fff',
