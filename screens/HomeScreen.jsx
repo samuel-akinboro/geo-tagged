@@ -96,7 +96,7 @@ export default function HomeScreen({navigation}) {
         onChange={handleSheetChanges}
         enablePanDownToClose={true}
       >
-        <View style={{flex: 0.70}}>
+        <View style={{flex: 1}}>
           <ZoomableImage 
             uri={previewImage?.uri} 
             style={styles.modalImage}
@@ -109,19 +109,19 @@ export default function HomeScreen({navigation}) {
           </TouchableOpacity>
         </View>
         <MapView 
-          style={{flex: 0.30}}
-          initialRegion={{
-            latitude: 6.527730,
-            longitude: 3.134468,
+          style={{height: Sizes.height * 0.30, width: Sizes.w}}
+          region={{
+            latitude: previewImage?.latitude || 25.276987,
+            longitude: previewImage?.longitude || 55.296249,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421
           }}
         >
-          <CustomMarker
+          {previewImage && <CustomMarker
             uri={previewImage?.uri}
             latitude={previewImage?.latitude}
             longitude={previewImage?.longitude}
-          />
+          />}
         </MapView>
       </BottomSheet>
     </View>
