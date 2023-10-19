@@ -82,22 +82,22 @@ export default function() {
 const savePhoto = async () => {
   if(!loading) {
     setLoading(true)
-  let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({});
 
-  const newUuid = uuidv4();
+    const newUuid = uuidv4();
 
-  saveImage({
-    id: newUuid,
-    uri: picture?.uri,
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude
-  }, (loadingState) => {
-    if(loadingState == false) {
-      setLoading(false)
-      setPicture(null);
-      handleClosePreview()
-    }
-  });
+    saveImage({
+      id: newUuid,
+      uri: picture?.uri,
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    }, (loadingState) => {
+      if(loadingState == false) {
+        setLoading(false)
+        setPicture(null);
+        handleClosePreview()
+      }
+    });
   }
 };
 

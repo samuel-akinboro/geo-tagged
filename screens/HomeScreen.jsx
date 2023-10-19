@@ -67,10 +67,10 @@ export default function HomeScreen({navigation}) {
           </TouchableOpacity>
         )}
         columnWrapperStyle={{
-          gap: 10
+          gap: 15,
         }}
         contentContainerStyle={{
-          gap: 10
+          gap: 15,
         }}
         ListEmptyComponent={(
           <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: Sizes.height * .30}}>
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   gridImage: {
-    width: (Sizes.width - (Sizes.padding * 2)) * .30,
+    width: (Sizes.width - (Sizes.padding * 2)) * .305,
     aspectRatio: 1,
     borderRadius: Sizes.radius
   },
